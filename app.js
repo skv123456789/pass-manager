@@ -1,52 +1,47 @@
-console.log('starting password manager');
+var weather = require('./weather.js');
+var location = require('./location.js');
+var argv = require('yargs')
+	.option('location', {
+		alias: 'l',
+		demand: false,
+		describe: 'Location to fetch weather for',
+		type: 'string'
+	})
+	.help('help')
+	.argv;
 
-var storage = require('node-persist');
-storage.initSync();
-
-// account.name Facebook
-// account.username User12!
-// account.password Password123!
-
-function createAccount (account) {
-	var accounts = storage.getItemSync('accounts');
-
-	if (typeof accounts === 'undefined') {
-		accounts = [];
-	}
-
-	accounts.push(account);
-	storage.setItemSync('accounts', accounts);
-
-	return account;
-}
-
-function getAccount (accountName) {
-	var accounts = storage.getItemSync('accounts');
-	var matchedAccount;
-
-	accounts.forEach(function (account) {
-		if (account.name === accountName) {
-			matchedAccount = account;
-		}
+if (typeof argv.l === 'string' && argv.l.length > 0) {
+	console.log('Location was provided');
+	
+	weather(argv.l).then(function (currentWeather) {
+		console.log(currentWeather);
+	}).catch(function (error) {
+		console.log(error);
+	})
+} else {
+	console.log('Location was not provided');
+	
+	location().then(function (loc) {
+		return weather(loc.city);
+	}).then(function (currentWeather) {
+		console.log(currentWeather);
+	}).catch(function (error) {
+		console.log(error)
 	});
-
-	return matchedAccount;
 }
 
- createAccount(
- {
- 	name: 'facebook',
- 	username: 'someemail@facebook.com',
- 	password: 'Password1234!'
- });
- 
-  createAccount(
- {
- 	name: 'twitter',
- 	username: 'someemail@twitter.com',
- 	password: 'Password1234!'
- }
- );
 
-var facebookAccount = getAccount('twitter');
-console.log(facebookAccount);
+
+
+
+
+
+
+
+
+
+
+
+
+
+
